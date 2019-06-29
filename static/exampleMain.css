@@ -1,0 +1,168 @@
+body {
+  background-color: orange;
+  font-family: 'Alex Brush';
+  color: lawngreen;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+#TopBar {
+ height: 5%;
+ width:100%;
+ position: relative;
+ text-align: center;
+ display: flex;
+ flex-direction: column;
+}
+
+#MainNav {
+ background-color:#33658A;
+ padding-left:1vw;
+ padding-right:1vw;
+ width: 100%;
+ flex-direction: row;
+ display: inline-flex;
+ align-items: center;
+ font-size: 2vw;
+}
+
+#MainSection {
+  background-color: #86BBD8;
+  height: 100%;
+  padding-top: 1%;
+  padding-left: 1%;
+  padding-right: 1%;
+  position: relative;
+  left:0;
+  top:0;
+  right:20vh;
+  bottom: auto;
+  color: cyan;
+
+  flex-direction: column;
+}
+
+.TitleBox{
+  display: flex;
+  text-decoration: none;
+}
+
+#title {
+  display: inline;
+  color: Black;
+  font-size: 3vw;
+  vertical-align: top;
+  text-align: center;
+  padding-right: 1vw;
+  text-decoration: none;
+}
+
+nav {
+  padding-top: 1vh;
+}
+
+.Button {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: row;
+  margin-left: 2%;
+  margin-right: 2%;
+  padding-top: 0;
+  padding-bottom: 0;
+  text-align: center;
+  vertical-align: middle;
+  text-decoration: none;
+}
+
+#myBills {
+  float: left;
+  margin-left: 12%;
+}
+
+#logout{
+  float: right;
+}
+
+a{
+  text-decoration: none;
+}
+
+a.Button:hover{
+  background: #76ABC8;
+}
+
+a:hover {
+  color: Black;
+
+}
+
+a:visited {
+  color: Black;
+}
+
+a:link {
+  color: Black;
+}
+
+
+#Content {
+  display: flex;
+  flex-direction: column;
+  margin-left: 5vw;
+  margin-right: 5vw;
+  margin-top: 2vh;
+  background-color: #C5C5C5;
+  height: 100vh;
+  width: 92%;
+  color: black;
+  align-items: center;
+}
+
+#BillList {
+  display: flex;
+  flex-direction: column;
+}
+
+.ClickableRow:hover {
+  background: #76ABC8;
+}
+
+tr {
+  background-color: #5385AA;
+  padding-top: 1%;
+  padding-bottom: 1%;
+}
+
+td {
+  margin-right: 1vw;
+  margin-left: 1vw;
+  padding-left: 2vw;
+  align-self: center;
+  vertical-align: middle;
+}
+
+table {
+  background-color: #43759A;
+  margin-top: 1vh;
+  margin-bottom: 1vh;
+  width: 50vw;
+  height: 15vh;
+  text-align: center;
+  vertical-align: middle;
+  border: 1px black;
+}
+
+th {
+  font-weight: bold;
+  text-align: center;
+}
+
+.HeaderRow {
+  margin-top: 1vh;
+  margin-bottom: 1vh;
+  padding-top: 1vh;
+  padding-right: 1vh;
+  background-color: #33658A;
+  width: 100%;
+}

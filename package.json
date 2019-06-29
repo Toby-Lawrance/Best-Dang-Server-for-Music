@@ -1,0 +1,26 @@
+{
+  "name": "best-dang-server-for-music",
+  "version": "0.0.1",
+  "description": "UWCS mandated Server",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Toby-Lawrance/Best-Dang-Server-for-Music.git"
+  },
+  "keywords": [
+    "Music",
+    "Server"
+  ],
+  "author": "Toby Lawrance",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Toby-Lawrance/Best-Dang-Server-for-Music/issues"
+  },
+  "homepage": "https://github.com/Toby-Lawrance/Best-Dang-Server-for-Music#readme",
+  "dependencies": {
+    "youtube-dl": "^2.0.0"
+  }
+}
