@@ -21,6 +21,7 @@ class Upload extends React.Component
   constructor(props)
   {
     super(props);
+    this.state = {devBox1:""}
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
@@ -39,7 +40,11 @@ class Upload extends React.Component
            'Content-Type': 'application/json',
        },
     })
-    .then(response => console.log(response));
+    .then(response => response.json())
+    .then(json => {
+      console.log("Got: " + JSON.stringify(json));
+      this.setState({devBox1:JSON.stringify(json)});
+  });
 
   }
 
@@ -47,6 +52,9 @@ class Upload extends React.Component
     return (
       <div className="UploadBox">
         <form id="uploadYTform" onSubmit={this.handleSubmit}>
+          <div className="devBox">
+            <label>{this.state.devBox1}</label>
+          </div>
           <div className="ytUrl">
             <label className="title">URL:</label>
             <input type="text" name="url" id="urlInp" />
@@ -64,7 +72,7 @@ class Display extends React.Component
   constructor(props)
   {
     super(props);
-    this.state = {numBuckets:5};
+    this.state = {numBuckets:10};
   }
 
   render ()

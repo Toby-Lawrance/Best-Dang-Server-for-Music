@@ -3,6 +3,7 @@ var path = require('path');
 var logger = require('./logger');
 var admin = require('./admin');
 var downloader = require('./download');
+var player = require('./player');
 logger.log("Instance started",NONE);
 
 const app = express();
@@ -23,14 +24,19 @@ app.get('/', function (req,res) {
   res.sendFile(path.join(__dirname + 'static/index.html'));
 });
 
-app.post('/ytd',function(req,res) {
+app.post('/ytd',async function(req,res) {
   logger.log("URL received: " + req.body.url,MEDIUM);
   try {
-    var info = downloader.getVidInfo(req.body.url);
-    res.status(200).send(info.title);
+    var info = await downloader.getVidInfo(req.body.url);
+    logger.log("Retrieval successful: " + info.title, HIGH);
+    logger.log("Temp playing: " + info.title, DEV);
+    let file = await downloader.downloadFromURL(req.body.url);
+    logger.log("Got the filename: " + file,HIGH);
+    player.play(file);
+    res.status(200).send({"title":info.title});
   } catch (e) {
     logger.error("Issue with info" + JSON.stringify(e.message));
-    res.status(406).send("Can't get Info" + JSON.stringify(e.message));
+    res.status(406).send(JSON.parse("Can't get Info" + JSON.stringify(e.message)));
   }
 });
 
