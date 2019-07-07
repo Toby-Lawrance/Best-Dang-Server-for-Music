@@ -17,10 +17,44 @@ class Bucket extends React.Component
 
 class Upload extends React.Component
 {
+
+  constructor(props)
+  {
+    super(props);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+
+  handleSubmit(event)
+  {
+    event.preventDefault();
+
+    const data = Object.fromEntries(new FormData(event.target));
+    console.log("Sending: " + JSON.stringify(data));
+    console.log(data);
+    fetch('/ytd', {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: {
+           'Content-Type': 'application/json',
+       },
+    })
+    .then(response => console.log(response));
+
+  }
+
   render() {
     return (
       <div className="UploadBox">
-        UploadBox
+        <form id="uploadYTform" onSubmit={this.handleSubmit}>
+          <div className="ytUrl">
+            <label className="title">URL:</label>
+            <input type="text" name="url" id="urlInp" />
+          </div>
+          <div className="btn">
+            <input type="submit" id="submitBtn" value="Submit" />
+          </div>
+        </form>
       </div>
     );
   }

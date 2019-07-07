@@ -16,11 +16,22 @@
   ],
   "author": "Toby Lawrance",
   "license": "MIT",
+  "dependencies": {
+    "babel-preset-react-app": "^3.1.2",
+    "body-parser": "^1.19.0",
+    "child_process": "^1.0.2",
+    "cookie-parser": "^1.4.4",
+    "express": "^4.17.1",
+    "ffmpeg": "0.0.4",
+    "jquery": "^3.4.1",
+    "jsonfile": "^5.0.0",
+    "multer": "^1.4.1",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "youtube-dl": "^2.0.0"
+  },
   "bugs": {
     "url": "https://github.com/Toby-Lawrance/Best-Dang-Server-for-Music/issues"
   },
-  "homepage": "https://github.com/Toby-Lawrance/Best-Dang-Server-for-Music#readme",
-  "dependencies": {
-    "youtube-dl": "^2.0.0"
-  }
+  "homepage": "https://github.com/Toby-Lawrance/Best-Dang-Server-for-Music#readme"
 }
