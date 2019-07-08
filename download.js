@@ -28,28 +28,6 @@ var downloadFromURL = async function(url)
   let x = await Vidpromise;
 
   return info._filename;
-  /*
-  var video = ytd(url,['--format=18'],{cwd:__dirname});
-
-  var fName = "error.mp4";
-  video.on('info',function(info) {
-    logger.log('Began downloading: ' + info.title,MEDIUM);
-    logger.log('filename: ' + info._filename,HIGH);
-    fName = info._filename;
-    logger.log('size: ' + info.size,HIGH);
-  });
-
-  video.pipe(fs.createWriteStream('tmp/'+fName));
-
-  video.on('end', function() {
-    logger.log(fName + " downloaded",HIGH);
-    const vlc = child.spawn('vlc',['--play-and-exit','tmp/'+fName]);
-
-    vlc.on('exit', (code,signal)=> {
-      logger.log(fName + " ended",MEDIUM);
-    })
-  });
-  */
 }
 
 var getVidInfo = async function(url)
