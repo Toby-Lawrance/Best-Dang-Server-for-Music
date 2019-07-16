@@ -15,19 +15,20 @@ var downloadFromURL = async function(url)
   });
 
   let info = await Infopromise;
+  let fName = Date.now() + '-' + info._filename;
 
-  video.pipe(fs.createWriteStream('tmp/'+info._filename));
+  video.pipe(fs.createWriteStream('tmp/'+ fName));
 
   const Vidpromise = new Promise((resolve,reject) => {
     video.on('end', function() {
-      logger.log(info._filename + " downloaded.", HIGH);
+      logger.log(fName + " downloaded.", HIGH);
       resolve();
     });
   });
 
   let x = await Vidpromise;
 
-  return info._filename;
+  return {title:info.title,file:fName,length:info.duration,start:info.start_time};
 }
 
 var getVidInfo = async function(url)
@@ -45,7 +46,7 @@ var getVidInfo = async function(url)
 
   let videoInf = await promise;
   logger.log("Function done title: " + videoInf.title, HIGH);
-  return videoInf;
+  return {title:videoInf.title,length:videoInf.duration,start:videoInf.start_time,rawInfo:videoInf};
 }
 
 module.exports = {

@@ -1,20 +1,60 @@
 var child = require('child_process');
 var logger = require('./logger');
 var fs = require('fs');
+var buckets = require('./buckets');
 
-module.exports.play = async function(videoLoc)
+var playing = false;
+
+module.exports.isPlaying = function()
+{
+  return playing;
+}
+
+var play = async function(videoLoc)
 {
   try {
+    playing = true;
     const vlc = child.spawn('vlc',['-f','--play-and-exit','tmp/'+videoLoc]);
 
-    vlc.on('exit', (code,signal)=> {
-      logger.log(videoLoc + " ended",MEDIUM);
-      fs.unlink('tmp/'+videoLoc, (err) => {
-        if(err) {logger.error("Deletion issue: " + err);}
-        logger.log(videoLoc + " has been deleted.",MEDIUM);
-      });
-    });
+    return vlc;
+
   } catch (e) {
     logger.error("Issue playing: " + e);
   }
 }
+
+module.exports.playSongs = async function()
+{
+  logger.log("Loop started",HIGH);
+  while(!buckets.isEmpty())
+  {
+    var video = buckets.getNextVideo();
+    if(!video)
+    {
+      logger.log("Did not get a video from the buckets",HIGH);
+      return;
+    }
+
+    logger.log("Playing: " + video.title,LOW);
+
+    var vlc = await play(video.file);
+
+    var promise = new Promise((resolve,reject) => {
+      if(false){reject();}
+      vlc.on('exit', (code,signal)=> {
+        var fName = video.file;
+        fs.unlink('tmp/'+video.file, (err) => {
+          if(err) {logger.error("Deletion issue: " + err);}
+          logger.log(fName + " has been deleted.",MEDIUM);
+        });
+        resolve();
+      });
+    });
+
+    await promise;
+    logger.log(video.title + " ended",MEDIUM);
+    playing = false;
+  }
+}
+
+module.exports.play = play;

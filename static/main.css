@@ -14,6 +14,15 @@ body {
 }
 
 .Bucket {
+  background-color: grey;
+  height; auto;
+  margin-left: 10vw;
+  margin-right: 10vw;
+  margin-top: 2vh;
+  margin-bottom: 2vh;
+}
+
+.Bucket {
   background-color: red;
   width: 80vw;
   margin-left: 10vw;
@@ -40,6 +49,9 @@ body {
   border-width: medium;
   border: 1;
   display: flex;
+  margin: 10;
+  height: auto;
+  width: auto;
 }
 
 .tab {

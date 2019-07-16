@@ -1,15 +1,46 @@
+class Video extends React.Component
+{
+  constructor(props)
+  {
+    super(props);
+    this.state = {value: props.value};
+  }
+
+  render() {
+    return (
+      <div className="Song">
+        <div className="SongTitle">
+          {this.state.value.title}
+        </div>
+        <div className="SongLength">
+          {this.state.value.length}
+        </div>
+      </div>
+    );
+  }
+}
+
 class Bucket extends React.Component
 {
   constructor(props)
   {
     super(props);
-    this.state = {bucketNum: props.value}
+    this.state = {bucketNum: props.value, contents:props.contents};
   }
 
   render() {
+    var songs = [];
+    for(var i = 0; i < this.state.contents.length; i++)
+    {
+      songs.push(<li><Video key={this.state.contents[i]} value={this.state.contents[i]} /></li>);
+    }
+
     return (
       <div className="Bucket">
         Bucket {this.state.bucketNum}
+        <ol className="BucketList">
+          {songs}
+        </ol>
       </div>
     );
   }
@@ -30,14 +61,14 @@ class YTUpload extends React.Component
     const data = Object.fromEntries(new FormData(event.target));
     console.log("Sending: " + JSON.stringify(data));
     console.log(data);
+
     fetch('/ytd', {
       method: 'POST',
       body: JSON.stringify(data),
       headers: {
            'Content-Type': 'application/json',
        },
-    })
-    .then(response => response.json())
+    }).then(response => response.json())
     .then(json => {
       console.log("Got: " + JSON.stringify(json));
   });
@@ -65,12 +96,39 @@ class FileUpload extends React.Component
   constructor(props)
   {
     super(props);
+
+    this.state = {
+      selectedFile: null
+    }
+
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.onChangeHandler = this.onChangeHandler.bind(this);
   }
 
   handleSubmit(event)
   {
+    event.preventDefault();
 
+    const data = new FormData();
+
+    data.append('file',this.state.selectedFile);
+
+    console.log("Sending: " + JSON.stringify(data));
+    fetch('/file', {
+      method: 'POST',
+      body: data,
+    })
+    .then(response => response.json())
+    .then(json => {
+      console.log("Got: " + JSON.stringify(json));
+  });
+  }
+
+  onChangeHandler(event)
+  {
+    event.preventDefault();
+    console.log(event.target.files[0]);
+    this.setState({selectedFile:event.target.files[0]});
   }
 
   render()
@@ -78,8 +136,8 @@ class FileUpload extends React.Component
     return (
     <form id="uploadFileform" onSubmit={this.handleSubmit}>
       <div className="fUpload">
-        <label className="file:">FILE:</label>
-        <input type="file" name="file" id="fileInp" />
+        <label className="file:">File:</label>
+        <input type="file" name="file" id="fileInp" onChange={this.onChangeHandler}/>
       </div>
       <div className="btn">
         <input type="submit" id="submitBtn" value="Submit" />
@@ -95,39 +153,82 @@ class Upload extends React.Component
   constructor(props)
   {
     super(props);
-    this.state = {devBox1:"",ytShow:"inline",fShow:"none"}
+    this.state = {devBox1:"",ytShow:true,fShow:false}
     this.swapTab = this.swapTab.bind(this);
   }
 
-  swapTab = (val) => {
-    switch(val) {
-      case 0: this.setState({ytShow:"inline",fShow:"none"});
-              break;
-      case 1: this.setState({ytShow:"none",fShow:"inline"});
-              break;
-    }
+  swapTab() {
+    this.setState({ytShow:!this.state.ytShow,fShow:!this.state.fShow});
   }
 
   render() {
     return (
       <div className="UploadBox">
         <div className="tabs">
-          <a className="tab" onClick={() => this.swapTab(0)} >YT</a>
-          <a className="tab" onClick={() => this.swapTab(1)} >File</a>
+          <a className="tab" onClick={this.swapTab} >YT</a>
+          <a className="tab" onClick={this.swapTab} >File</a>
         </div>
         <div className="devBox">
           <label>{this.state.devBox1}</label>
         </div>
         <div className="ytdBox" style={{display:this.state.ytShow}}>
-          <YTUpload />
+          { this.state.ytShow ? <YTUpload /> : null }
         </div>
         <div className="fileBox" style={{display:this.state.fShow}}>
-          <FileUpload />
+          { this.state.fShow ? <FileUpload /> : null}
         </div>
       </div>
     );
   }
 }
+
+class Buckets extends React.Component
+{
+  constructor(props) {
+    super(props);
+
+    this.state={buckets:[]};
+    this.componentDidMount = this.componentDidMount.bind(this);
+    this.componentWillUnmount = this.componentWillUnmount.bind(this);
+
+  }
+
+  componentDidMount() {
+    this.timerID = setInterval(
+      () => {
+        fetch('/queue',{
+        method:'POST'
+      }).then(response => response.json())
+      .then(json => {
+        this.setState({buckets:json.buckets});
+        console.log("State of buckets: " + JSON.stringify(this.state.buckets));
+      }).catch(err => console.log("Server appears to be down or have an error: " + err));
+    }
+      , 2500
+    );
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timerID);
+  }
+
+
+  render() {
+    var buckets = [];
+
+    for(var i = 0; i < this.state.buckets.length; i++)
+    {
+      buckets.push(<Bucket key={this.state.buckets[i]} value={i} contents={this.state.buckets[i]} />);
+    }
+
+    return (
+      <div className="Buckets">
+      {buckets}
+      </div>
+    );
+  }
+}
+
 class Display extends React.Component
 {
   constructor(props)
@@ -138,16 +239,10 @@ class Display extends React.Component
 
   render ()
   {
-    var buckets = [];
-    for(var i = 0; i < this.state.numBuckets; i++)
-    {
-      buckets.push(<Bucket key={i} value={i} />);
-    }
     return (
         <div className="MainSection">
           <Upload />
-          Hello World! The React component works
-          {buckets}
+          <Buckets />
         </div>
       );
   }

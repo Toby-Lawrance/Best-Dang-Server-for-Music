@@ -4,10 +4,14 @@ var logger = require('./logger');
 var admin = require('./admin');
 var downloader = require('./download');
 var player = require('./player');
+var bucks = require('./buckets');
+var cors = require('cors');
+var multer = require('multer');
 logger.log("Instance started",NONE);
 
 const app = express();
 
+app.use(cors());
 app.use(express.static('static'));
 app.use(express.json());       // to support JSON-encoded bodies
 app.use(express.urlencoded({ extended: true })); // to support URL-encoded bodies
@@ -20,6 +24,17 @@ app.use(function(req, res, next) {
         next();
       });
 
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'tmp');
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' +file.originalname )
+  }
+});
+
+
+
 app.get('/', function (req,res) {
   res.sendFile(path.join(__dirname + 'static/index.html'));
 });
@@ -29,15 +44,36 @@ app.post('/ytd',async function(req,res) {
   try {
     var info = await downloader.getVidInfo(req.body.url);
     logger.log("Retrieval successful: " + info.title, HIGH);
-    logger.log("Temp playing: " + info.title, DEV);
-    let file = await downloader.downloadFromURL(req.body.url);
-    logger.log("Got the filename: " + file,HIGH);
-    player.play(file);
     res.status(200).send({"title":info.title});
+    bucks.uploadYTVideo(req.body.url,req.ip,null);
   } catch (e) {
     logger.error("Issue with info" + JSON.stringify(e.message));
     res.status(406).send(JSON.parse("Can't get Info" + JSON.stringify(e.message)));
   }
+});
+
+var upload = multer({storage: storage});
+app.post('/file', upload.single('file'), async function(req,res) {
+
+  const file = req.file;
+  if(!file)
+  {
+    const err = new Error("Please upload a file");
+    logger.error("Upload issue: " + JSON.stringify(err));
+    return res.status(500).json(err);
+  }
+  bucks.uploadFileVideo(res.req.file.filename,req.ip,null);
+  return res.status(200).send(req.file);
+});
+
+app.post('/queue', function(req,res) {
+  let buckets = bucks.getQueue();
+  if(buckets.length < 1)
+  {
+    buckets.push([]);
+    logger.log("Padding buckets response: " + JSON.stringify(buckets),HIGH);
+  }
+  return res.status(200).json({"buckets":buckets});
 });
 
 var confport = admin.getPort();
