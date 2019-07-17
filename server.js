@@ -5,6 +5,7 @@ var admin = require('./admin');
 var downloader = require('./download');
 var player = require('./player');
 var bucks = require('./buckets');
+var users = require('./user');
 var cors = require('cors');
 var multer = require('multer');
 logger.log("Instance started",NONE);
@@ -39,9 +40,15 @@ app.get('/', function (req,res) {
   res.sendFile(path.join(__dirname + 'static/index.html'));
 });
 
+app.post('/alias',async function(req,res) {
+  if(!users.userExists(req.ip)) {users.createUser(req.ip);}
+});
+
 app.post('/ytd',async function(req,res) {
   logger.log("URL received: " + req.body.url,MEDIUM);
   try {
+    if(!users.userExists(req.ip)) {users.createUser(req.ip);}
+
     var info = await downloader.getVidInfo(req.body.url);
     logger.log("Retrieval successful: " + info.title, HIGH);
     res.status(200).send({"title":info.title});
@@ -54,7 +61,7 @@ app.post('/ytd',async function(req,res) {
 
 var upload = multer({storage: storage});
 app.post('/file', upload.single('file'), async function(req,res) {
-
+  if(!users.userExists(req.ip)) {users.createUser(req.ip);}
   const file = req.file;
   if(!file)
   {
@@ -67,6 +74,7 @@ app.post('/file', upload.single('file'), async function(req,res) {
 });
 
 app.post('/queue', function(req,res) {
+  if(!users.userExists(req.ip)) {users.createUser(req.ip);}
   let buckets = bucks.getQueue();
   if(buckets.length < 1)
   {

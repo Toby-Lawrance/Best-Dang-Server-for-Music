@@ -136,7 +136,7 @@ class FileUpload extends React.Component
     return (
     <form id="uploadFileform" onSubmit={this.handleSubmit}>
       <div className="fUpload">
-        <label className="file:">File:</label>
+        <label className="filelbl">File:</label>
         <input type="file" name="file" id="fileInp" onChange={this.onChangeHandler}/>
       </div>
       <div className="btn">
@@ -147,13 +147,30 @@ class FileUpload extends React.Component
   }
 }
 
+class AliasBox extends React.Component
+{
+  render() {
+    return (
+      <form id="aliasBox" onSubmit={this.handleSubmit}>
+          <div className ="alias">
+            <label className="aliaslbl">Alias: </label>
+            <input type="text" name="alias" id="aliasInp"/>
+          </div>
+          <div className="btn">
+            <input type="submit" id="submitBtn" value="Submit" />
+          </div>
+      </form>
+    );
+  }
+}
+
 class Upload extends React.Component
 {
 
   constructor(props)
   {
     super(props);
-    this.state = {devBox1:"",ytShow:true,fShow:false}
+    this.state = {ytShow:true,fShow:false}
     this.swapTab = this.swapTab.bind(this);
   }
 
@@ -168,14 +185,14 @@ class Upload extends React.Component
           <a className="tab" onClick={this.swapTab} >YT</a>
           <a className="tab" onClick={this.swapTab} >File</a>
         </div>
-        <div className="devBox">
-          <label>{this.state.devBox1}</label>
-        </div>
         <div className="ytdBox" style={{display:this.state.ytShow}}>
           { this.state.ytShow ? <YTUpload /> : null }
         </div>
         <div className="fileBox" style={{display:this.state.fShow}}>
           { this.state.fShow ? <FileUpload /> : null}
+        </div>
+        <div className="AliasBox">
+          <AliasBox />
         </div>
       </div>
     );
