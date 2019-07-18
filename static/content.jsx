@@ -149,12 +149,46 @@ class FileUpload extends React.Component
 
 class AliasBox extends React.Component
 {
+  constructor(props)
+  {
+    super(props);
+    this.state = {alias:""};
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(event)
+  {
+    this.setState({alias:event.target.value});
+  }
+
+  handleSubmit(event)
+  {
+    event.preventDefault();
+
+    const data = JSON.stringify(Object.fromEntries(new FormData(event.target)));
+
+    console.log("Sending: " + data);
+    fetch('/alias', {
+      method: 'POST',
+      body: data,
+      headers: {
+           'Content-Type': 'application/json',
+       },
+    })
+    .then(response => response.json())
+    .then(json => {
+      console.log("Got: " + JSON.stringify(json));
+      this.setState({alias:json.alias});
+  });
+  }
+
   render() {
     return (
       <form id="aliasBox" onSubmit={this.handleSubmit}>
           <div className ="alias">
             <label className="aliaslbl">Alias: </label>
-            <input type="text" name="alias" id="aliasInp"/>
+            <input type="text" name="alias" id="aliasInp" value={this.state.alias} onChange={this.handleChange} />
           </div>
           <div className="btn">
             <input type="submit" id="submitBtn" value="Submit" />

@@ -37,11 +37,19 @@ var storage = multer.diskStorage({
 
 
 app.get('/', function (req,res) {
-  res.sendFile(path.join(__dirname + 'static/index.html'));
+  res.status(200).sendFile(path.join(__dirname + 'static/index.html'));
 });
 
 app.post('/alias',async function(req,res) {
   if(!users.userExists(req.ip)) {users.createUser(req.ip);}
+  logger.log("Received Alias request: " + JSON.stringify(req.body),HIGH);
+  if(req.body.alias)
+  {
+    users.setAlias(req.ip,req.body.alias);
+    res.status(200).send(req.body);
+  } else {
+    res.status(418).send("Send something?");
+  }
 });
 
 app.post('/ytd',async function(req,res) {

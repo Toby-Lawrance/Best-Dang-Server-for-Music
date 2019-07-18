@@ -3,6 +3,7 @@ var admin = require('./admin');
 var player = require('./player');
 var downloader = require('./download');
 var ffmpeg = require('ffmpeg');
+var users = require('./user');
 
 var buckets = [];
 
@@ -53,17 +54,32 @@ var addToQueue = function(videoObject,user) {
 
 var uploadYTVideo = async function(url,ip,img) {
   try {
+    var user = users.getUser(ip);
     var video = await downloader.downloadFromURL(url);
-    logger.log("Added video: " + JSON.stringify(video) + " from: " + ip,LOW);
-    addToQueue(video,null);
+    logger.log("Added video: " + JSON.stringify(video) + " from: " + JSON.stringify(user),LOW);
+    if(!user)
+    {
+      throw Error("User not found: " + ip);
+    }
+    if(!video)
+    {
+      throw Error("Video not found: " + url);
+    }
+    addToQueue(video,user);
   } catch (e) {
     logger.error("Error attempting to upload: " + url + " error: " + e);
   }
 }
 
 var uploadFileVideo = async function(file,ip,img) {
+  var user = users.getUser(ip);
   var video = {title:file,file:file, length: null, start:0 };
-  addToQueue(video,null);
+  logger.log("Added video: " + JSON.stringify(video) + " from: " + JSON.stringify(user),LOW);
+  if(!user)
+  {
+    throw Error("User not found: " + ip);
+  }
+  addToQueue(video,user);
 }
 
 var isEmpty = function()
