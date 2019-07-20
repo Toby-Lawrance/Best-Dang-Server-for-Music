@@ -58,7 +58,6 @@ app.post('/ytd',async function(req,res) {
     if(!users.userExists(req.ip)) {users.createUser(req.ip);}
 
     var info = await downloader.getVidInfo(req.body.url);
-    logger.log("Retrieval successful: " + info.title, HIGH);
     res.status(200).send({"title":info.title});
     bucks.uploadYTVideo(req.body.url,req.ip,null);
   } catch (e) {
@@ -83,11 +82,10 @@ app.post('/file', upload.single('file'), async function(req,res) {
 
 app.post('/queue', function(req,res) {
   if(!users.userExists(req.ip)) {users.createUser(req.ip);}
-  let buckets = bucks.getQueue();
+  let buckets = bucks.getQueue(req.ip);
   if(buckets.length < 1)
   {
     buckets.push([]);
-    logger.log("Padding buckets response: " + JSON.stringify(buckets),HIGH);
   }
   return res.status(200).json({"buckets":buckets});
 });

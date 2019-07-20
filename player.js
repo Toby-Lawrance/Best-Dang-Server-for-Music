@@ -43,10 +43,7 @@ module.exports.playSongs = async function()
       if(false){reject();}
       vlc.on('exit', (code,signal)=> {
         var fName = video.file;
-        fs.unlink('tmp/'+video.file, (err) => {
-          if(err) {logger.error("Deletion issue: " + err);}
-          logger.log(fName + " has been deleted.",MEDIUM);
-        });
+        deleteSong(fName);
         resolve();
       });
     });
@@ -58,3 +55,13 @@ module.exports.playSongs = async function()
 }
 
 module.exports.play = play;
+
+var deleteSong = function(file)
+{
+  fs.unlink('tmp/'+file, (err) => {
+    if(err) {logger.error("Deletion issue: " + err);}
+    logger.log(file + " has been deleted.",MEDIUM);
+  });
+}
+
+module.exports.deleteSong = deleteSong;

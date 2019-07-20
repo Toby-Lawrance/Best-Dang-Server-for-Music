@@ -7,19 +7,45 @@ var users = require('./user');
 
 var buckets = [];
 
-var getQueue = function() {
-  return buckets;
+var getQueue = function(ip) {
+  var user = users.getUser(ip);
+  if(!user)
+  {
+      logger.log("Returning a non personalised Queue",HIGH);
+      return buckets;
+  }
+
+  var personalisedBuckets = []; //Quick way to clone an array
+
+  for(var i = 0; i < buckets.length; i++)
+  {
+    var bucket = buckets[i];
+    var timeLeft = getTimeLeftInBucket(user,i);
+    personalisedBuckets[i] = {timeLeft:timeLeft,songs:bucket};
+  }
+
+  logger.log("Returning a personalised queue: " + JSON.stringify(personalisedBuckets),HIGH);
+
+  return personalisedBuckets;
 }
 
 var popNextVideo = function() {
   if(buckets.length === 0)
     {return null;}
-  if(buckets[0].length === 0)
+
+  for(var i = 0; i < buckets[0].length; i++)
+  {
+    var song = buckets[0][i];
+    if(!song.played)
     {
-      buckets.shift();
-      return popNextVideo();
+      song.played = true;
+      return song;
     }
-  return buckets[0].shift();
+  }
+  //If all Songs in the bucket are played, then pop the bucket and do the next one via recursion
+  buckets.shift();
+  return popNextVideo();
+
 }
 
 var getTimeLeftInBucket = function(user,index) {
@@ -29,11 +55,11 @@ var getTimeLeftInBucket = function(user,index) {
     return;
   }
   var timeLeft = admin.getBucketLength();
-  for(var song in buckets[index])
+  for(var song of buckets[index])
   {
     if(song.user.ip === user.ip)
     {
-      timeLeft = timeLeft - song.end;
+      timeLeft = timeLeft - song.length;
     }
   }
 
@@ -48,18 +74,17 @@ var getTimeLeftInBucket = function(user,index) {
 
 var addToQueue = function(videoObject,user) {
   try {
-    videoObject = videoSanity(videoObject);
-
+    videoObject = videoSanity(videoObject,user);
+    logger.log("Attempting to queue: " + JSON.stringify(videoObject),DEV);
     if(buckets.length === 0)
     {
-      logger.log("Strong suspicion this shouldn't actually ever happen unless someone is very fast",HIGH);
-      buckets.push([videoObject]);
-      return true;
+      buckets.push([]);
     }
 
     for(var i = 0; i < buckets.length; i++)
     {
       var remainingTime = getTimeLeftInBucket(user,i);
+      logger.log("Bucket " + i + " has: " + remainingTime + " seconds left and video is: " + videoObject.length + "s long",DEV);
       if(videoObject.length <= remainingTime)
       {
         buckets[i].push(videoObject);
@@ -68,10 +93,9 @@ var addToQueue = function(videoObject,user) {
           logger.log("Fresh song is here",DEV);
           player.playSongs(); //Trigger loop when adding a fresh song
         }
+        logger.log("Queued song: " + JSON.stringify(videoObject) + " in Bucket: " + i,HIGH);
+        return true;
       }
-
-      logger.log("Queued song: " + JSON.stringify(videoObject) + " in Bucket: " + i);
-      return true;
     }
 
     buckets.push([videoObject]);
@@ -79,23 +103,38 @@ var addToQueue = function(videoObject,user) {
 
   } catch (e) {
     logger.error("I probably messed up here: " + e);
+    if(videoObject && videoObject.file)
+    {
+          player.deleteSong(videoObject.file);
+    }
     return false;
   }
 }
 
-var videoSanity = function(video)
+var videoSanity = function(video,user)
 {
-  if(video.start === null)
+  if(!video.start)
   {
     video.start = 0;
   }
 
-  if(video.length > admin.getBucketLength() && (video.end > admin.getBucketLength() || video.end === 0)) //Length refers to raw length here
+  if(!video.end)
+  {
+    video.end = video.length;
+  }
+
+  if(video.length > admin.getBucketLength() && ((video.end - video.start) > admin.getBucketLength() || video.end === 0)) //Length refers to raw length here
   {
     video.end = admin.getBucketLength();
   }
 
   video.length = video.end - video.start; //Length refers to play length here
+
+  if(!video.user)
+  {
+    logger.log("No user found on video, applying: " + JSON.stringify(user),DEV);
+    video.user = user;
+  }
 
   return video;
 }

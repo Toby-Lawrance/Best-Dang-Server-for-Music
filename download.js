@@ -9,7 +9,6 @@ var downloadFromURL = async function(url)
 
   const Infopromise = new Promise((resolve,reject) => {
       video.on('info', function(info) {
-        logger.log("Got video info",HIGH);
         resolve(info);
       });
   });
@@ -28,7 +27,7 @@ var downloadFromURL = async function(url)
 
   let x = await Vidpromise;
 
-  return {title:info.title,file:fName,length:info.duration,start:info.start_time,end:info.duration,played:false};
+  return {title:info.title,file:fName,length:info._duration_raw,start:info.start_time,end:info._duration_raw,played:false};
 }
 
 var getVidInfo = async function(url)
@@ -36,8 +35,6 @@ var getVidInfo = async function(url)
   const promise = new Promise((resolve,reject) => {
     ytd.getInfo(url,[],function(err,info) {
       if (err) { reject(); }
-
-      logger.log("video title: " + info.title,HIGH);
       resolve(info);
     });
   });
@@ -45,7 +42,6 @@ var getVidInfo = async function(url)
   promise.catch(error => {logger.error("Issue: " + error);})
 
   let videoInf = await promise;
-  logger.log("Function done title: " + videoInf.title, HIGH);
   return {title:videoInf.title,length:videoInf.duration,start:videoInf.start_time,rawInfo:videoInf};
 }
 

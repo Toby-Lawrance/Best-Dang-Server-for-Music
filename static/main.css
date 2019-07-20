@@ -6,7 +6,7 @@ body {
 
 .MainSection {
   background-color: #86BBD8;
-  height: 100vh;
+  height: auto;
   left:0;
   top:0;
   bottom: auto;
@@ -60,4 +60,12 @@ body {
   display: flex;
   border-width: thick;
   border: 1;
+}
+
+.Song {
+  background-color: Fuchsia;
+}
+
+.SongPlayed {
+  background-color: Aqua;
 }

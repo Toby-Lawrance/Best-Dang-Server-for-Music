@@ -7,13 +7,17 @@ class Video extends React.Component
   }
 
   render() {
+    var user = this.state.value.user.alias ? this.state.value.user.alias : this.state.value.user.ip;
     return (
-      <div className="Song">
+      <div className={this.state.value.played ? "SongPlayed" : "Song"}>
         <div className="SongTitle">
           {this.state.value.title}
         </div>
         <div className="SongLength">
           {this.state.value.length}
+        </div>
+        <div className="SongUploader">
+          {user}
         </div>
       </div>
     );
@@ -25,7 +29,7 @@ class Bucket extends React.Component
   constructor(props)
   {
     super(props);
-    this.state = {bucketNum: props.value, contents:props.contents};
+    this.state = {bucketNum: props.value, contents:props.contents,timeLeft:props.timeLeft};
   }
 
   render() {
@@ -38,6 +42,9 @@ class Bucket extends React.Component
     return (
       <div className="Bucket">
         Bucket {this.state.bucketNum}
+        <div className="timeInfo" style={{float:'right'}}>
+          {this.state.timeLeft}
+        </div>
         <ol className="BucketList">
           {songs}
         </ol>
@@ -253,6 +260,7 @@ class Buckets extends React.Component
       .then(json => {
         this.setState({buckets:json.buckets});
         console.log("State of buckets: " + JSON.stringify(this.state.buckets));
+        //this.refs.bucketList.reset();
       }).catch(err => console.log("Server appears to be down or have an error: " + err));
     }
       , 2500
@@ -269,12 +277,20 @@ class Buckets extends React.Component
 
     for(var i = 0; i < this.state.buckets.length; i++)
     {
-      buckets.push(<Bucket key={this.state.buckets[i]} value={i} contents={this.state.buckets[i]} />);
+      var uniqueKey = (new Date()).getTime() + "-" +  i;
+
+      if(Array.isArray(this.state.buckets[i]))
+      {
+        buckets.push(<Bucket key={uniqueKey} value={i} timeLeft="N/A" contents={this.state.buckets[i]} />);
+      } else {
+        buckets.push(<Bucket key={uniqueKey} value={i} timeLeft={this.state.buckets[i].timeLeft} contents={this.state.buckets[i].songs} />);
+      }
+
     }
 
     return (
-      <div className="Buckets">
-      {buckets}
+      <div className="Buckets" ref="bucketList">
+        {buckets}
       </div>
     );
   }
