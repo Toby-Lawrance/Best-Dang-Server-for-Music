@@ -14,4 +14,8 @@ module.exports = {
     return config.Port;
   },
 
+  getBucketLength: function() {
+    return config.bucketLength;
+  }
+
 }

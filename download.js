@@ -28,7 +28,7 @@ var downloadFromURL = async function(url)
 
   let x = await Vidpromise;
 
-  return {title:info.title,file:fName,length:info.duration,start:info.start_time};
+  return {title:info.title,file:fName,length:info.duration,start:info.start_time,end:info.duration,played:false};
 }
 
 var getVidInfo = async function(url)
