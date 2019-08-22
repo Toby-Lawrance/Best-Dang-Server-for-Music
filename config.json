@@ -1,5 +1,1 @@
-{
-  "LogLevel":"DEV",
-  "Port": 8080,
-  "bucketLength":575
-}
+{"LogLevel":"DEV","Port":8080,"bucketLength":575,"salt":"vVwBxFrzwyK/t6bDd2/aaUsphiWxPh2KO6es0UO2iLQ=","pass":"Ms/qwMdHPZg3e36Pe5MzttkSzJpGOdeufFAbDY9al5w="}
